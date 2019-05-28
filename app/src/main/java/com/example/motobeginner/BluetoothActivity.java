@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -57,6 +58,8 @@ public class BluetoothActivity extends AppCompatActivity {
     private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
     private final static int CONNECTING_STATUS = 3; // used in bluetooth handler to identify message status
 
+    private byte[] readBuffer = new byte[1024];
+    private int readBufferPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -288,6 +291,8 @@ public class BluetoothActivity extends AppCompatActivity {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        private final byte delimiter = 10;
+
 
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
@@ -308,15 +313,41 @@ public class BluetoothActivity extends AppCompatActivity {
         public void run() {
             byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes; // bytes returned from read()
+
+
             // Keep listening to the InputStream until an exception occurs
             while (true) {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.available();
                     if(bytes != 0) {
-                        SystemClock.sleep(100); //pause and wait for rest of data. Adjust this depending on your sending speed.
-                        bytes = mmInStream.available(); // how many bytes are ready to be read?
-                        bytes = mmInStream.read(buffer, 0, bytes); // record how many bytes we actually read
+                        SystemClock.sleep(200); //pause and wait for rest of data. Adjust this depending on your sending speed.
+                        //bytes = mmInStream.available(); // how many bytes are ready to be read?
+                        //bytes = mmInStream.read(buffer, 0, bytes); // record how many bytes we actually read
+                        bytes = mmInStream.read(buffer);
+
+                        for(int i=0; i<bytes; i++){
+                            byte b = buffer[i];
+                            if(b == delimiter) {
+                                byte[] encodedBytes = new byte[readBufferPosition];
+                                System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                final String data = new String(encodedBytes, "US-ASCII");
+                                readBufferPosition = 0;
+                                Handler handler = new Handler(Looper.getMainLooper());
+
+                                handler.post(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getBaseContext(), data, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                            else{
+                                readBuffer[readBufferPosition++] = b;
+                            }
+                        }
+
                         mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                                 .sendToTarget(); // Send the obtained bytes to the UI activity
                     }
@@ -343,5 +374,6 @@ public class BluetoothActivity extends AppCompatActivity {
             } catch (IOException e) { }
         }
     }
-    
+
+
 }
