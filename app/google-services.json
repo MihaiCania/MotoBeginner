@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "21229502365",
+    "firebase_url": "https://motobeginner.firebaseio.com",
+    "project_id": "motobeginner",
+    "storage_bucket": "motobeginner.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:21229502365:android:d9f096958080ea34",
+        "android_client_info": {
+          "package_name": "com.example.motobeginner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "21229502365-lukdh2kneh9et4726e4go875jqct2592.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.motobeginner",
+            "certificate_hash": "9ba9c3b2fe23820b8566c59b8ca815e573453b30"
+          }
+        },
+        {
+          "client_id": "21229502365-b0of7ca08ej4k2ptdko4b49ru9nklemt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8aiYeOOJp2nh9HoXXnpFYFGrfM7t00Ew"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "21229502365-b0of7ca08ej4k2ptdko4b49ru9nklemt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
