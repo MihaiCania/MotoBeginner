@@ -75,8 +75,10 @@ void loop() {
 
   BTserial.print("X= ");
   BTserial.print(Xout);
+  
   BTserial.print("   Y= ");
   BTserial.print(Yout);
+
   BTserial.print("   Z= ");
   BTserial.println(Zout);
   delay(200);
