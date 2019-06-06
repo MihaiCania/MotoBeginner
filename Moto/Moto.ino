@@ -73,13 +73,26 @@ void loop() {
   Zout = (Wire.read() | Wire.read() << 8); // Z-axis value
   Zout = Zout/256; //For a range of +-2g, we need to divide the raw values by 256, according to the datasheet
 
-  BTserial.print("X= ");
+  //BTserial.print("X= ");
   BTserial.print(Xout);
-  
-  BTserial.print("   Y= ");
+  BTserial.print(" ");
+  //BTserial.print("   Y= ");
   BTserial.print(Yout);
+  BTserial.print(" ");
+  //BTserial.print("   Z= ");
+  BTserial.print(Zout);
+  BTserial.print(" ");
 
-  BTserial.print("   Z= ");
-  BTserial.println(Zout);
+  BTserial.print(0);
+  BTserial.print(" ");
+  
+  BTserial.print(200);
+  BTserial.print(" ");
+  
+  BTserial.print(300);
+  BTserial.print(" ");
+
+  BTserial.print(400);
+  BTserial.println(" ");
   delay(200);
 }

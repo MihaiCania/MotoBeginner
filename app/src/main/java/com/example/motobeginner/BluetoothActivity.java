@@ -8,33 +8,33 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
 import java.util.UUID;
-import java.util.zip.Inflater;
 
 public class BluetoothActivity extends AppCompatActivity {
 
@@ -67,6 +67,13 @@ public class BluetoothActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private FirebaseAuth.AuthStateListener authListener;
+    private FirebaseDatabase database;
+    DatabaseReference myRef;
+    private FirebaseUser user;
+    private String userID;
+
+    private ArduinoValues arduinoValues = new ArduinoValues();
+    private Long entries = new Long(0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,19 +81,42 @@ public class BluetoothActivity extends AppCompatActivity {
         setContentView(R.layout.activity_bluetooth);
 
         auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference();
+
+
         // this listener will be called when there is change in firebase user session
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                user = auth.getCurrentUser();
                 if (user == null) {
                     // user auth state is changed - user is null
                     // launch login activity
                     startActivity(new Intent(BluetoothActivity.this, LoginActivity.class));
                     finish();
                 }
+                else {
+                    userID = user.getUid();
+                }
             }
         };
+
+        // assign entries with the last child of the database
+        // in order to have all the previous values and add new ones into the database
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                FirebaseUser user = auth.getCurrentUser();
+                String userID = user.getUid();
+                entries = dataSnapshot.child(userID).getChildrenCount();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         mBluetoothStatus = (TextView) findViewById(R.id.bluetoothStatus);
         mReadBuffer = (TextView) findViewById(R.id.readBuffer);
@@ -296,30 +326,31 @@ public class BluetoothActivity extends AppCompatActivity {
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
         private final byte delimiter = 10;
 
 
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
             InputStream tmpIn = null;
-            OutputStream tmpOut = null;
 
             // Get the input and output streams, using temp objects because
             // member streams are final
             try {
                 tmpIn = socket.getInputStream();
-                tmpOut = socket.getOutputStream();
             } catch (IOException e) {
             }
 
             mmInStream = tmpIn;
-            mmOutStream = tmpOut;
         }
 
         public void run() {
             byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes; // bytes returned from read()
+            String prevData = "";
+
+            //Send me to the Main Activity when the BluetoothActivity started to add values to the DATABASE
+            Intent intent = new Intent(BluetoothActivity.this, MainActivity.class);
+            startActivity(intent);
 
 
             // Keep listening to the InputStream until an exception occurs
@@ -341,6 +372,7 @@ public class BluetoothActivity extends AppCompatActivity {
                                 final String data = new String(encodedBytes, "US-ASCII");
                                 //final String data = Integer.toString(encodedBytes.length);
                                 readBufferPosition = 0;
+                                /*
                                 Handler handler = new Handler(Looper.getMainLooper());
 
                                 handler.post(new Runnable() {
@@ -350,6 +382,22 @@ public class BluetoothActivity extends AppCompatActivity {
                                         Toast.makeText(getBaseContext(), data, Toast.LENGTH_LONG).show();
                                     }
                                 });
+                                */
+
+                                //NO NEED FOR CLASS
+                                float[] arr = stringToArduinoValues(data, 0);
+                                if (!prevData.equals(data)) {
+                                    entries++;
+                                    myRef.child(userID).child(String.valueOf(entries)).child("X").setValue(arr[0]);
+                                    myRef.child(userID).child(String.valueOf(entries)).child("Y").setValue(arr[1]);
+                                    myRef.child(userID).child(String.valueOf(entries)).child("Z").setValue(arr[2]);
+                                    myRef.child(userID).child(String.valueOf(entries)).child("leftHandFinger").setValue(arr[3]);
+                                    myRef.child(userID).child(String.valueOf(entries)).child("rightHandFinger").setValue(arr[4]);
+                                    myRef.child(userID).child(String.valueOf(entries)).child("rightHandAccel").setValue(arr[5]);
+                                    myRef.child(userID).child(String.valueOf(entries)).child("rightHandPressure").setValue(arr[6]);
+                                    prevData = data;
+                                }
+
                             } else {
                                 readBuffer[readBufferPosition++] = b;
                             }
@@ -361,13 +409,29 @@ public class BluetoothActivity extends AppCompatActivity {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-
                     break;
                 }
             }
         }
     }
 
+    private float [] stringToArduinoValues(String data, int cnt) {
+        if(data != null) {
+            float[] arr = new float[7];
+            String number = "";
+            for (char c : data.toCharArray()) {
+                if (c != ' ') {
+                    number = number + c;
+                } else {
+                    arr[cnt] = Float.parseFloat(number);
+                    cnt++;
+                    number = "";
+                }
+            }
+            return arr;
+        }
+        return null;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -418,5 +482,11 @@ public class BluetoothActivity extends AppCompatActivity {
         if (authListener != null) {
             auth.removeAuthStateListener(authListener);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        auth.signOut();
     }
 }
