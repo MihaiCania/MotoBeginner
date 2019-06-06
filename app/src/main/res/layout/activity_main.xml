@@ -19,16 +19,16 @@
 
     <Button
         android:id="@+id/btn_view"
-        android:layout_width="wrap_content"
+        android:layout_width="149dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginStart="158dp"
-        android:layout_marginLeft="158dp"
-        android:layout_marginEnd="158dp"
-        android:layout_marginRight="158dp"
+        android:layout_marginStart="131dp"
+        android:layout_marginLeft="131dp"
+        android:layout_marginEnd="131dp"
+        android:layout_marginRight="131dp"
         android:text="View" />
 
 </RelativeLayout>

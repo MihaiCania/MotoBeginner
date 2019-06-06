@@ -23,6 +23,9 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,14 +47,15 @@ public class MainActivity extends AppCompatActivity {
     private float y;
     private GraphView graphView;
 
-    SaveState graphState;
+    private Long entries = new Long(0);
+    //SaveState graphState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        graphState  = (SaveState) getApplicationContext();
+        //graphState  = (SaveState) getApplicationContext();
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -91,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 FirebaseUser user = auth.getCurrentUser();
                 String userID = user.getUid();
-                Long value = dataSnapshot.child(userID).getChildrenCount();
-                Toast.makeText(getApplicationContext(), ""+ value, Toast.LENGTH_SHORT).show();
+                entries = dataSnapshot.child(userID).getChildrenCount();
+                //Toast.makeText(getApplicationContext(), ""+ entries, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -130,8 +134,9 @@ public class MainActivity extends AppCompatActivity {
         mViewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                graphView.addSeries(series);
-                Toast.makeText(getApplicationContext(), "Current point: " + graphState.getCurrent(), Toast.LENGTH_SHORT).show();
+                series = new LineGraphSeries<>();
+                cnt = 0;
+                plotGraph(entries);
             }
         });
 
@@ -141,10 +146,34 @@ public class MainActivity extends AppCompatActivity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                series.appendData(new DataPoint(x,y), false, 1000);
+                series.appendData(new DataPoint(x,y), false, 18000);
             }
-        }, 200);
+        }, 10);
     }
+
+    //take all the entries from the database until a given one and make a graph using them
+    private Long i;
+    private void plotGraph(Long number) {
+            FirebaseUser user = auth.getCurrentUser();
+            String userID = user.getUid();
+            myRef = FirebaseDatabase.getInstance().getReference().child(userID);
+            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                        addPoints(cnt,ds.child("Z").getValue(Float.class));
+                        cnt++;
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        graphView.addSeries(series);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -213,9 +242,8 @@ public class MainActivity extends AppCompatActivity {
         if (authListener != null) {
             auth.removeAuthStateListener(authListener);
         }
-        graphState.setCurrent(cnt);
+        //graphState.setCurrent(cnt);
         //graphState.LoadData(series);
-        cnt = 0;
     }
 
 
