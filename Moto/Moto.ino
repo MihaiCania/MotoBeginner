@@ -43,6 +43,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  lHandFingerOut = analogRead(lHandFinger);
   /*
   rHandPressureOut = analogRead(rHandPressure);
   rHandAccelOut = analogRead(rHandAccel);
@@ -83,7 +84,7 @@ void loop() {
   BTserial.print(Zout);
   BTserial.print(" ");
 
-  BTserial.print(0);
+  BTserial.print(lHandFingerOut);
   BTserial.print(" ");
   
   BTserial.print(200);

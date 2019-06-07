@@ -21,9 +21,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".SaveState"
         android:theme="@style/AppTheme">
-        <activity android:name=".ClutchGraphActivity"></activity>
+        <activity android:name=".GyroscopeActivity"></activity>
+        <activity android:name=".FrontBrakeActivity" />
+        <activity android:name=".ClutchAccelActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

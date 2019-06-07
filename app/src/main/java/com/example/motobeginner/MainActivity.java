@@ -23,7 +23,10 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -38,24 +41,18 @@ public class MainActivity extends AppCompatActivity {
     //private FirebaseUser user;
     //private String userID;
 
-    private static ArduinoValues arduinoValues = new ArduinoValues();
     private int cnt = 0;
 
     private Handler mHandler = new Handler();
     private static LineGraphSeries<DataPoint> series = new LineGraphSeries<>();
-    private float x;
-    private float y;
     private GraphView graphView;
 
     private Long entries = new Long(0);
-    //SaveState graphState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //graphState  = (SaveState) getApplicationContext();
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -64,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
         mViewBtn = (Button) findViewById(R.id.btn_view);
         graphView = (GraphView) findViewById(R.id.graphView);
 
-        //series = new LineGraphSeries<>();
-        //graphView.addSeries(series);
 
         graphView.getViewport().setMinX(0);
         graphView.getViewport().setMaxX(10000);
@@ -73,6 +68,11 @@ public class MainActivity extends AppCompatActivity {
 
         graphView.getViewport().setScalable(true);
 
+        Date c = Calendar.getInstance().getTime();
+
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        String date = df.format(c);
+        Toast.makeText(getApplicationContext(), date , Toast.LENGTH_SHORT).show();
 
         // this listener will be called when there is change in firebase user session
         authListener = new FirebaseAuth.AuthStateListener() {
@@ -104,32 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-        /*
-        //run every time a change is made into the database
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot ds) {
-                FirebaseUser user = auth.getCurrentUser();
-                String userID = user.getUid();
-                arduinoValues.setX(ds.child(userID).child("X").getValue(Float.class));
-                arduinoValues.setY(ds.child(userID).child("Y").getValue(Float.class));
-                arduinoValues.setZ(ds.child(userID).child("Z").getValue(Float.class));
-                arduinoValues.setlHandFinger(ds.child(userID).child("leftHandFinger").getValue(Float.class));
-                arduinoValues.setrHandFinger(ds.child(userID).child("rightHandFinger").getValue(Float.class));
-                arduinoValues.setrHandAccel(ds.child(userID).child("rightHandAccel").getValue(Float.class));
-                arduinoValues.setrHandPressure(ds.child(userID).child("rightHandPressure").getValue(Float.class));
-                Toast.makeText(getApplicationContext(), "Z: " + arduinoValues.getZ(), Toast.LENGTH_SHORT).show();
-                addPoints(cnt, arduinoValues.getZ());
-                cnt++;
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "Failed to read value.", Toast.LENGTH_SHORT).show();
-            }
-        });
-        */
 
         mViewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,8 +164,10 @@ public class MainActivity extends AppCompatActivity {
                 return false;
 
             case R.id.graphView:
-                Intent intent2 = new Intent(MainActivity.this, MainActivity.class);
+
+                Intent intent2 = new Intent(MainActivity.this, ClutchAccelActivity.class);
                 startActivity(intent2);
+
                 return false;
 
             case R.id.resetPass:
@@ -217,24 +193,6 @@ public class MainActivity extends AppCompatActivity {
         auth.addAuthStateListener(authListener);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        /*
-        graphState.setCurrent(cnt);
-        graphState.LoadData(series);
-        */
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        /*
-        series = new LineGraphSeries<>();
-        cnt = graphState.getCurrent();
-        series = graphState.UnloadData();
-        */
-    }
 
     @Override
     public void onStop() {
@@ -242,8 +200,6 @@ public class MainActivity extends AppCompatActivity {
         if (authListener != null) {
             auth.removeAuthStateListener(authListener);
         }
-        //graphState.setCurrent(cnt);
-        //graphState.LoadData(series);
     }
 
 

@@ -33,6 +33,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
@@ -72,8 +75,8 @@ public class BluetoothActivity extends AppCompatActivity {
     private FirebaseUser user;
     private String userID;
 
-    private ArduinoValues arduinoValues = new ArduinoValues();
     private Long entries = new Long(0);
+    private String date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +86,6 @@ public class BluetoothActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference();
-
 
         // this listener will be called when there is change in firebase user session
         authListener = new FirebaseAuth.AuthStateListener() {
@@ -102,6 +104,12 @@ public class BluetoothActivity extends AppCompatActivity {
             }
         };
 
+        //Take the current date in a normal format
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        date = df.format(c);
+        Toast.makeText(getApplicationContext(), date , Toast.LENGTH_SHORT).show();
+
         // assign entries with the last child of the database
         // in order to have all the previous values and add new ones into the database
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -109,7 +117,8 @@ public class BluetoothActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 FirebaseUser user = auth.getCurrentUser();
                 String userID = user.getUid();
-                entries = dataSnapshot.child(userID).getChildrenCount();
+                entries = dataSnapshot.child(date).child(userID).getChildrenCount();
+
             }
 
             @Override
@@ -388,13 +397,13 @@ public class BluetoothActivity extends AppCompatActivity {
                                 float[] arr = stringToArduinoValues(data, 0);
                                 if (!prevData.equals(data)) {
                                     entries++;
-                                    myRef.child(userID).child(String.valueOf(entries)).child("X").setValue(arr[0]);
-                                    myRef.child(userID).child(String.valueOf(entries)).child("Y").setValue(arr[1]);
-                                    myRef.child(userID).child(String.valueOf(entries)).child("Z").setValue(arr[2]);
-                                    myRef.child(userID).child(String.valueOf(entries)).child("leftHandFinger").setValue(arr[3]);
-                                    myRef.child(userID).child(String.valueOf(entries)).child("rightHandFinger").setValue(arr[4]);
-                                    myRef.child(userID).child(String.valueOf(entries)).child("rightHandAccel").setValue(arr[5]);
-                                    myRef.child(userID).child(String.valueOf(entries)).child("rightHandPressure").setValue(arr[6]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("X").setValue(arr[0]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("Y").setValue(arr[1]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("Z").setValue(arr[2]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("leftHandFinger").setValue(arr[3]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("rightHandFinger").setValue(arr[4]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("rightHandAccel").setValue(arr[5]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("rightHandPressure").setValue(arr[6]);
                                     prevData = data;
                                 }
 
