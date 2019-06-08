@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -97,8 +99,8 @@ public class FrontBrakeActivity extends AppCompatActivity {
         initialSeries(1000, y, seriesMinY);
 
         seriesMinY.setColor(Color.RED);
-        bendGraph.setTitle("Press");
-        pressureGraph.setTitle("Force");
+        bendGraph.setTitle("Brake");
+        pressureGraph.setTitle("Brake Pressure");
         bendGraph.addSeries(seriesMinY);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -108,8 +110,8 @@ public class FrontBrakeActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), date, Toast.LENGTH_SHORT).show();
                 bendSeries = new GraphSeries(new LineGraphSeries<DataPoint>(), 0, bendGraph);
                 pressureSeries = new GraphSeries(new LineGraphSeries<DataPoint>(), 0, pressureGraph);
-                plotGraph("rightHandFinger" , bendSeries);
-                plotGraph("rightHandPressure", pressureSeries);
+                plotGraph("Brake" , bendSeries);
+                plotGraph("Brake Pressure", pressureSeries);
             }
         });
     }
@@ -163,5 +165,61 @@ public class FrontBrakeActivity extends AppCompatActivity {
             }
         });
         graph.getGraph().addSeries(graph.getSeries());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.popup_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.bluetooth:
+                Intent intent = new Intent(FrontBrakeActivity.this, BluetoothActivity.class);
+                startActivity(intent);
+                return false;
+
+            case R.id.graphView:
+                Intent intent2 = new Intent(FrontBrakeActivity.this, MainActivity.class);
+                startActivity(intent2);
+                return false;
+
+            case R.id.resetPass:
+                Intent intent3 = new Intent(FrontBrakeActivity.this, ResetPasswordActivity.class);
+                startActivity(intent3);
+                return false;
+
+            case R.id.signOut:
+                signOut();
+                return false;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void signOut() {
+        auth.signOut();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        auth.addAuthStateListener(authListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (authListener != null) {
+            auth.removeAuthStateListener(authListener);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        auth.signOut();
     }
 }

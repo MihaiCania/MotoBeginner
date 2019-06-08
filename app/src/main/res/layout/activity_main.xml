@@ -6,29 +6,31 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.jjoe64.graphview.GraphView
-        android:id="@+id/graphView"
-        android:layout_width="match_parent"
-        android:layout_height="555dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="48dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginRight="0dp" />
+    <Button
+        android:id="@+id/btnGyro"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="20dp"
+        android:text="Gyroscope" />
 
     <Button
-        android:id="@+id/btn_view"
-        android:layout_width="149dp"
+        android:id="@+id/btnClutchAccel"
+        android:layout_centerHorizontal="true"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="131dp"
-        android:layout_marginLeft="131dp"
-        android:layout_marginEnd="131dp"
-        android:layout_marginRight="131dp"
-        android:text="View" />
+        android:layout_below="@+id/btnGyro"
+        android:layout_margin="20dp"
+        android:text="Acceleration and Clutch" />
+
+    <Button
+        android:id="@+id/btnBrake"
+        android:layout_centerHorizontal="true"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnClutchAccel"
+        android:layout_margin="20dp"
+        android:text="Front Brake" />
 
 </RelativeLayout>

@@ -20,10 +20,6 @@ public class GraphSeries {
         return series;
     }
 
-    public void setSeries(LineGraphSeries<DataPoint> series) {
-        this.series = series;
-    }
-
     public void add(DataPoint dp) {
         series.appendData(dp, true, 18000);
     }
@@ -36,15 +32,8 @@ public class GraphSeries {
         return cnt;
     }
 
-    public void setCnt(int cnt) {
-        this.cnt = cnt;
-    }
-
     public GraphView getGraph() {
         return graph;
     }
 
-    public void setGraph(GraphView graph) {
-        this.graph = graph;
-    }
 }

@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -130,5 +132,61 @@ public class GyroscopeActivity extends AppCompatActivity {
             }
         });
         graph.getGraph().addSeries(graph.getSeries());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.popup_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.bluetooth:
+                Intent intent = new Intent(GyroscopeActivity.this, BluetoothActivity.class);
+                startActivity(intent);
+                return false;
+
+            case R.id.graphView:
+                Intent intent2 = new Intent(GyroscopeActivity.this, MainActivity.class);
+                startActivity(intent2);
+                return false;
+
+            case R.id.resetPass:
+                Intent intent3 = new Intent(GyroscopeActivity.this, ResetPasswordActivity.class);
+                startActivity(intent3);
+                return false;
+
+            case R.id.signOut:
+                signOut();
+                return false;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void signOut() {
+        auth.signOut();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        auth.addAuthStateListener(authListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (authListener != null) {
+            auth.removeAuthStateListener(authListener);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        auth.signOut();
     }
 }

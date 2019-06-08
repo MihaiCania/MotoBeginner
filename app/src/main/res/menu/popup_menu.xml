@@ -8,7 +8,7 @@
         app:showAsAction="ifRoom" />
 
     <item android:id="@+id/graphView"
-        android:title="Graph View"
+        android:title="Select Graph"
         app:showAsAction="never" />
 
     <item android:id="@+id/resetPass"

@@ -3,14 +3,14 @@ package com.example.motobeginner;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,9 +24,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ClutchAccelActivity extends AppCompatActivity {
 
@@ -114,8 +111,8 @@ public class ClutchAccelActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), date, Toast.LENGTH_SHORT).show();
                 accelSeries = new GraphSeries(new LineGraphSeries<DataPoint>(), 0, accelGraph);
                 clutchSeries = new GraphSeries(new LineGraphSeries<DataPoint>(), 0, clutchGraph);
-                plotGraph("rightHandAccel" , accelSeries);
-                plotGraph("leftHandFinger", clutchSeries);
+                plotGraph("Acceleration" , accelSeries);
+                plotGraph("Clutch", clutchSeries);
             }
         });
     }
@@ -169,5 +166,61 @@ public class ClutchAccelActivity extends AppCompatActivity {
             }
         });
         graph.getGraph().addSeries(graph.getSeries());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.popup_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.bluetooth:
+                Intent intent = new Intent(ClutchAccelActivity.this, BluetoothActivity.class);
+                startActivity(intent);
+                return false;
+
+            case R.id.graphView:
+                Intent intent2 = new Intent(ClutchAccelActivity.this, MainActivity.class);
+                startActivity(intent2);
+                return false;
+
+            case R.id.resetPass:
+                Intent intent3 = new Intent(ClutchAccelActivity.this, ResetPasswordActivity.class);
+                startActivity(intent3);
+                return false;
+
+            case R.id.signOut:
+                signOut();
+                return false;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void signOut() {
+        auth.signOut();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        auth.addAuthStateListener(authListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (authListener != null) {
+            auth.removeAuthStateListener(authListener);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        auth.signOut();
     }
 }

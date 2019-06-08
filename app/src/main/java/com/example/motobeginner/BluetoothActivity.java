@@ -400,10 +400,10 @@ public class BluetoothActivity extends AppCompatActivity {
                                     myRef.child(userID).child(date).child(String.valueOf(entries)).child("X").setValue(arr[0]);
                                     myRef.child(userID).child(date).child(String.valueOf(entries)).child("Y").setValue(arr[1]);
                                     myRef.child(userID).child(date).child(String.valueOf(entries)).child("Z").setValue(arr[2]);
-                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("leftHandFinger").setValue(arr[3]);
-                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("rightHandFinger").setValue(arr[4]);
-                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("rightHandAccel").setValue(arr[5]);
-                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("rightHandPressure").setValue(arr[6]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("Clutch").setValue(arr[3]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("Brake").setValue(arr[4]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("Acceleration").setValue(arr[5]);
+                                    myRef.child(userID).child(date).child(String.valueOf(entries)).child("Brake Pressure").setValue(arr[6]);
                                     prevData = data;
                                 }
 
@@ -452,9 +452,7 @@ public class BluetoothActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.bluetooth:
-                Intent intent = new Intent(BluetoothActivity.this, BluetoothActivity.class);
-                startActivity(intent);
-                return false;
+                return true;
 
             case R.id.graphView:
                 Intent intent2 = new Intent(BluetoothActivity.this, MainActivity.class);
